@@ -6,7 +6,7 @@ from flask_login import LoginManager, UserMixin, login_user, logout_user, login_
 from datetime import datetime
 from wtforms import StringField, SubmitField, SelectField, DateField, TextAreaField, IntegerField, PasswordField, TelField, EmailField
 from flask_wtf import FlaskForm
-from wtforms.validators import DataRequired, Optional, Email, Length, NumberRange
+from wtforms.validators import DataRequired, Optional, Email, Length, NumberRange, EqualTo
 from flask_mail import Mail, Message
 import os
 
@@ -34,10 +34,14 @@ class EventSearchForm(FlaskForm):
 class RegistrationForm(FlaskForm):
     username = StringField('Username', validators=[DataRequired(), Length(min=2, max=80)])
     email = EmailField('Email', validators=[DataRequired(), Email()])
-    phone = TelField('Phone', validators=[Optional()])
-    whatsapp = TelField('WhatsApp', validators=[Optional()])
+    phone = TelField('Phone Number', validators=[Optional()])
+    whatsapp = TelField('WhatsApp Number', validators=[Optional()])
     password = PasswordField('Password', validators=[DataRequired(), Length(min=6)])
-    role = SelectField('Role', choices=[('attendee', 'Attendee'), ('organizer', 'Organizer')])
+    confirm_password = PasswordField('Confirm Password', validators=[DataRequired(), EqualTo('password')])  # ADD THIS LINE
+    role = SelectField('Role', choices=[
+        ('attendee', 'Attendee'),
+        ('organizer', 'Organizer')
+    ], default='attendee')
     submit = SubmitField('Register')
 
 class LoginForm(FlaskForm):
