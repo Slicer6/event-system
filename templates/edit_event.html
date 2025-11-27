@@ -1,0 +1,126 @@
+<!-- templates/edit_event.html -->
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title h4 mb-0">
+                        <i class="bi bi-pencil-square"></i> Edit Event: {{ event.title }}
+                    </h2>
+                </div>
+                <div class="card-body">
+                    <form method="POST">
+                        {{ form.hidden_tag() }}
+                        
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                {{ form.title.label(class="form-label") }}
+                                {{ form.title(class="form-control") }}
+                                {% for error in form.title.errors %}
+                                    <div class="text-danger">{{ error }}</div>
+                                {% endfor %}
+                            </div>
+                            
+                            <div class="col-md-6 mb-3">
+                                {{ form.category.label(class="form-label") }}
+                                {{ form.category(class="form-select") }}
+                                {% for error in form.category.errors %}
+                                    <div class="text-danger">{{ error }}</div>
+                                {% endfor %}
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            {{ form.description.label(class="form-label") }}
+                            {{ form.description(class="form-control", rows=4) }}
+                            {% for error in form.description.errors %}
+                                <div class="text-danger">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+
+                        <div class="mb-3">
+                            {{ form.tags.label(class="form-label") }}
+                            {{ form.tags(class="form-control", placeholder="tech, conference, networking (comma separated)") }}
+                            <div class="form-text">Add relevant tags to help people discover your event</div>
+                            {% for error in form.tags.errors %}
+                                <div class="text-danger">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                {{ form.date.label(class="form-label") }}
+                                {{ form.date(class="form-control", placeholder="YYYY-MM-DD") }}
+                                {% for error in form.date.errors %}
+                                    <div class="text-danger">{{ error }}</div>
+                                {% endfor %}
+                            </div>
+                            
+                            <div class="col-md-6 mb-3">
+                                {{ form.time.label(class="form-label") }}
+                                {{ form.time(class="form-control", placeholder="HH:MM") }}
+                                {% for error in form.time.errors %}
+                                    <div class="text-danger">{{ error }}</div>
+                                {% endfor %}
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            {{ form.venue.label(class="form-label") }}
+                            {{ form.venue(class="form-control") }}
+                            {% for error in form.venue.errors %}
+                                <div class="text-danger">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+
+                        <div class="mb-3">
+                            {{ form.capacity.label(class="form-label") }}
+                            {{ form.capacity(class="form-control") }}
+                            <div class="form-text">Enter 0 for unlimited capacity</div>
+                            {% for error in form.capacity.errors %}
+                                <div class="text-danger">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+
+                        <h5 class="mt-4 mb-3">Contact Information</h5>
+                        <div class="row">
+                            <div class="col-md-4 mb-3">
+                                {{ form.contact_phone.label(class="form-label") }}
+                                {{ form.contact_phone(class="form-control") }}
+                            </div>
+                            
+                            <div class="col-md-4 mb-3">
+                                {{ form.contact_whatsapp.label(class="form-label") }}
+                                {{ form.contact_whatsapp(class="form-control") }}
+                            </div>
+                            
+                            <div class="col-md-4 mb-3">
+                                {{ form.contact_email.label(class="form-label") }}
+                                {{ form.contact_email(class="form-control") }}
+                            </div>
+                        </div>
+
+                        <div class="d-flex gap-2 mt-4">
+                            {{ form.submit(class="btn btn-primary") }}
+                            <a href="{{ url_for('event_detail', event_id=event.id) }}" class="btn btn-secondary">Cancel</a>
+                            
+                            <button type="button" 
+                                    class="btn btn-danger ms-auto" 
+                                    onclick="if(confirm('Are you sure you want to delete this event? This action cannot be undone.')) { document.getElementById('delete-form').submit(); }">
+                                <i class="bi bi-trash"></i> Delete Event
+                            </button>
+                        </div>
+                    </form>
+
+                    <!-- Hidden delete form -->
+                    <form id="delete-form" action="{{ url_for('delete_event', event_id=event.id) }}" method="POST" style="display: none;">
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

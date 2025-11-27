@@ -1,0 +1,103 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>Analytics for: {{ event.title }}</h2>
+        <a href="{{ url_for('event_detail', event_id=event.id) }}" class="btn btn-secondary">← Back to Event</a>
+    </div>
+
+    <!-- Analytics Cards -->
+    <div class="row mb-4">
+        <div class="col-md-4">
+            <div class="card text-white bg-primary">
+                <div class="card-body">
+                    <h4 class="card-title">{{ total_registrations }}</h4>
+                    <p class="card-text">Total Registrations</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card text-white bg-success">
+                <div class="card-body">
+                    <h4 class="card-title">{{ recent_registrations }}</h4>
+                    <p class="card-text">Registrations (Last 7 Days)</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card text-white bg-info">
+                <div class="card-body">
+                    <h4 class="card-title">
+                        {% if event.capacity > 0 %}
+                            {{ "%.1f"|format(capacity_utilization) }}%
+                        {% else %}
+                            Unlimited
+                        {% endif %}
+                    </h4>
+                    <p class="card-text">Capacity Utilization</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Progress Bar for Capacity -->
+    {% if event.capacity > 0 %}
+    <div class="card mb-4">
+        <div class="card-header">
+            <h5>Capacity Progress</h5>
+        </div>
+        <div class="card-body">
+            <div class="progress" style="height: 30px;">
+                <div class="progress-bar {% if capacity_utilization >= 80 %}bg-warning{% else %}bg-success{% endif %}" 
+                     role="progressbar" 
+                     style="width: {{ capacity_utilization }}%;"
+                     aria-valuenow="{{ capacity_utilization }}" 
+                     aria-valuemin="0" 
+                     aria-valuemax="100">
+                    {{ total_registrations }} / {{ event.capacity }} ({{ "%.1f"|format(capacity_utilization) }}%)
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Attendee List -->
+    <div class="card">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <h5 class="mb-0">Recent Registrations</h5>
+            <a href="{{ url_for('event_attendees', event_id=event.id) }}" class="btn btn-primary btn-sm">
+                Manage All Attendees
+            </a>
+        </div>
+        <div class="card-body">
+            {% if registrations %}
+            <div class="table-responsive">
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Email</th>
+                            <th>Registered On</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for registration in registrations[:10] %}  <!-- Show last 10 -->
+                        <tr>
+                            <td>{{ registration.attendee.username }}</td>
+                            <td>{{ registration.attendee.email }}</td>
+                            <td>{{ registration.registered_at.strftime('%Y-%m-%d %H:%M') }}</td>
+                            <td><span class="badge bg-success">{{ registration.status }}</span></td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <p class="text-muted">No registrations yet.</p>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

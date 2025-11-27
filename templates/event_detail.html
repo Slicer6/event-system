@@ -1,0 +1,123 @@
+<!-- templates/event_detail.html -->
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="card mb-4">
+    <div class="card-body">
+        <h5 class="card-title">{{ event.title }}</h5>
+        <div class="mb-3">
+            <span class="badge bg-primary">{{ event.category.title() }}</span>
+            {% for tag in event.get_tags_list() %}
+            <span class="badge bg-secondary">{{ tag }}</span>
+            {% endfor %}
+        </div>
+        <p class="card-text">{{ event.description }}</p>
+
+<div class="event-detail">
+    <h2>{{ event.title }}</h2>
+    
+    <div class="event-info">
+        <p><strong>Description:</strong> {{ event.description }}</p>
+        <p><strong>Category:</strong> {{ event.category.title() }}</p>
+        <p><strong>Date:</strong> {{ event.date }}</p>
+        <p><strong>Time:</strong> {{ event.time }}</p>
+        <p><strong>Venue:</strong> {{ event.venue }}</p>
+        <p><strong>Organizer:</strong> {{ event.organizer.username }}</p>
+        
+        {% if event.capacity > 0 %}
+        <p><strong>Capacity:</strong> {{ current_registrations }} / {{ event.capacity }} registered</p>
+        {% else %}
+        <p><strong>Capacity:</strong> Unlimited</p>
+        {% endif %}
+    </div>
+
+    <!-- CONTACT INFORMATION WITH WHATSAPP AND PHONE -->
+    <div class="contact-section" style="background: #f8f9fa; padding: 1rem; border-radius: 5px; margin: 1rem 0;">
+        <h3>Contact Organizer</h3>
+        
+        {% if event.contact_whatsapp %}
+        <a href="https://wa.me/{{ event.contact_whatsapp }}?text=Hi! I'm interested in your event: {{ event.title }}" 
+           class="btn" 
+           style="background: #25D366; color: white; margin: 0.5rem;"
+           target="_blank">
+            📱 WhatsApp: {{ event.contact_whatsapp }}
+        </a>
+        {% endif %}
+        
+        {% if event.contact_phone %}
+        <a href="tel:{{ event.contact_phone }}" 
+           class="btn" 
+           style="background: #007bff; color: white; margin: 0.5rem;">
+            📞 Call: {{ event.contact_phone }}
+        </a>
+        {% endif %}
+        
+        {% if event.contact_email %}
+        <a href="mailto:{{ event.contact_email }}?subject=Inquiry about: {{ event.title }}" 
+           class="btn" 
+           style="background: #6c757d; color: white; margin: 0.5rem;">
+            ✉️ Email: {{ event.contact_email }}
+        </a>
+        {% endif %}
+    </div>
+
+    <!-- REGISTRATION BUTTON -->
+    <div class="registration-section">
+    {% if current_user.is_authenticated %}
+        <!-- ADD THIS CHECK: Only show register button if user is NOT the organizer -->
+        {% if current_user.id != event.organizer_id %}
+            {% if not is_registered %}
+                {% if event.capacity == 0 or current_registrations < event.capacity %}
+                    <a href="{{ url_for('register_event', event_id=event.id) }}" class="btn btn-primary">
+                        Register for this Event
+                    </a>
+                {% else %}
+                    <button class="btn btn-secondary" disabled>Event Full</button>
+                {% endif %}
+            {% else %}
+                <button class="btn btn-success" disabled>Already Registered ✓</button>
+            {% endif %}
+        {% else %}
+            <!-- Show this message for organizers -->
+            <div class="alert alert-info">
+                <strong>You're the organizer!</strong> You manage this event.
+            </div>
+        {% endif %}
+    {% else %}
+        <p><a href="{{ url_for('login') }}">Login</a> to register for this event</p>
+    {% endif %}
+</div>
+
+<!-- ORGANIZER CONTROLS - UPDATED VERSION -->
+{% if current_user.is_authenticated and current_user.id == event.organizer_id %}
+<div class="organizer-controls" style="margin: 2rem 0; padding: 1rem; background: #f8f9fa; border-radius: 5px;">
+    <h4>Organizer Dashboard</h4>
+    <div class="btn-group">
+        <a href="{{ url_for('edit_event', event_id=event.id) }}" class="btn btn-warning">
+            ✏️ Edit Event
+        </a>
+        <a href="{{ url_for('event_attendees', event_id=event.id) }}" class="btn btn-info">
+            👥 Manage Attendees ({{ current_registrations }})
+        </a>
+        <a href="{{ url_for('event_analytics', event_id=event.id) }}" class="btn btn-success">
+            📊 View Analytics
+        </a>
+        <form action="{{ url_for('delete_event', event_id=event.id) }}" method="POST" style="display: inline;">
+            <button type="submit" class="btn btn-danger" 
+                    onclick="return confirm('Are you sure you want to delete this event? This action cannot be undone.')">
+                🗑️ Delete Event
+            </button>
+        </form>
+    </div>
+    <p class="text-muted" style="margin-top: 0.5rem; font-size: 0.9rem;">
+        You are the organizer of this event
+    </p>
+</div>
+{% endif %}
+
+<div style="margin-top: 2rem;">
+    <a href="{{ url_for('events') }}" class="btn">← Back to All Events</a>
+</div>
+
+{% endblock %}

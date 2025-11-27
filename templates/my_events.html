@@ -1,0 +1,42 @@
+<!-- templates/my_events.html -->
+{% extends "base.html" %}
+
+{% block content %}
+<h2>My Events</h2>
+
+{% if user_role == 'organizer' %}
+    <p>These are events you have created:</p>
+{% else %}
+    <p>These are events you have registered for:</p>
+{% endif %}
+
+<div class="events-list">
+    {% for event in events %}
+    <div class="event-card" style="border: 1px solid #ddd; padding: 1rem; margin-bottom: 1rem; border-radius: 5px;">
+        <h3>{{ event.title }}</h3>
+        <p><strong>Date:</strong> {{ event.date }} at {{ event.time }}</p>
+        <p><strong>Venue:</strong> {{ event.venue }}</p>
+        <p><strong>Category:</strong> {{ event.category.title() }}</p>
+        
+        <div style="margin-top: 1rem;">
+            <a href="{{ url_for('event_detail', event_id=event.id) }}" class="btn">View Details</a>
+            
+            {% if user_role == 'organizer' %}
+            <span class="btn" style="background: #28a745;">Your Event</span>
+            {% else %}
+            <span class="btn" style="background: #17a2b8;">Registered ✓</span>
+            {% endif %}
+        </div>
+    </div>
+    {% else %}
+    <p>No events found.</p>
+    {% endfor %}
+</div>
+
+<div style="margin-top: 2rem;">
+    <a href="{{ url_for('events') }}" class="btn">Browse All Events</a>
+    {% if current_user.role == 'organizer' %}
+    <a href="{{ url_for('create_event') }}" class="btn">Create New Event</a>
+    {% endif %}
+</div>
+{% endblock %}

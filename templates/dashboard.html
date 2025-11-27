@@ -1,0 +1,28 @@
+<!-- templates/dashboard.html - UPDATED -->
+{% extends "base.html" %}
+
+{% block content %}
+<h2>Welcome to Your Dashboard, {{ user.username }}!</h2>
+
+<div class="user-info">
+    <h3>Your Information:</h3>
+    <p><strong>Username:</strong> {{ user.username }}</p>
+    <p><strong>Email:</strong> {{ user.email }}</p>
+    <p><strong>Role:</strong> {{ user.role.title() }}</p>
+    <p><strong>Phone:</strong> {{ user.phone or 'Not provided' }}</p>
+    <p><strong>WhatsApp:</strong> {{ user.whatsapp or 'Not provided' }}</p>
+    <p><strong>Member since:</strong> {{ user.created_at.strftime('%B %d, %Y') }}</p>
+</div>
+
+<div class="dashboard-actions">
+    <h3>Quick Actions:</h3>
+    <a href="{{ url_for('events') }}" class="btn">Browse All Events</a>
+    <a href="{{ url_for('my_events') }}" class="btn">View My Events</a>
+    
+    {% if user.role == 'organizer' %}
+        <a href="{{ url_for('create_event') }}" class="btn">Create New Event</a>
+    {% endif %}
+    
+    <a href="{{ url_for('logout') }}" class="btn" style="background: #dc3545;">Logout</a>
+</div>
+{% endblock %}
